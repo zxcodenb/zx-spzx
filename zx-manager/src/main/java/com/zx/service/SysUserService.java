@@ -1,6 +1,7 @@
 package com.zx.service;
 
 import com.zx.spzx.model.dto.system.LoginDto;
+import com.zx.spzx.model.entity.system.SysUser;
 import com.zx.spzx.model.vo.system.LoginVo;
 
 public interface SysUserService {
@@ -11,4 +12,7 @@ public interface SysUserService {
      */
     LoginVo login(LoginDto loginDto) ;
 
+    SysUser getUserInfo(String token);
+
+    void logOut(String token);
 }

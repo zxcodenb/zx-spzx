@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 @Schema(description = "验证码响应结果实体类")
 public class ValidateCodeVo {
 

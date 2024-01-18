@@ -30,6 +30,11 @@ public class SysUserServiceImpl implements SysUserService {
     private RedisTemplate<String , String> redisTemplate ;
 
 
+    /**
+     * 登陆方法
+     * @param loginDto
+     * @return
+     */
     @Override
     public LoginVo login(LoginDto loginDto) {
 
@@ -38,13 +43,15 @@ public class SysUserServiceImpl implements SysUserService {
         String captcha = loginDto.getCaptcha();
 
         //从redis获取
-        String redisCodekey = redisTemplate.opsForValue().get("user:login:validatecode:" + codeKey);
+        String redisCaptcha = redisTemplate.opsForValue().get("user:login:captcha:" + codeKey);
         //判断是否为空，并比较
-        if(StrUtil.isEmpty(redisCodekey) || !StrUtil.equalsIgnoreCase(redisCodekey , captcha)) {
+        if(StrUtil.isEmpty(redisCaptcha) || !StrUtil.equalsIgnoreCase(redisCaptcha , captcha)) {
             throw new ZxException(ResultCodeEnum.VALIDATECODE_ERROR) ;
         }
         // 验证通过删除redis中的验证码
-        redisTemplate.delete("user:login:validatecode:" + codeKey) ;
+        redisTemplate.delete("user:login:captcha:" + codeKey) ;
+
+
 
 
         // 根据用户名查询用户
@@ -65,13 +72,35 @@ public class SysUserServiceImpl implements SysUserService {
         // 生成令牌，保存数据到Redis中
         String token = UUID.randomUUID().toString().replace("-", "");
         redisTemplate.opsForValue().set("user:login:" + token , JSON.toJSONString(sysUser) , 30 , TimeUnit.MINUTES);
-
         // 构建响应结果对象
-        LoginVo loginVo = new LoginVo() ;
+        LoginVo loginVo = new LoginVo();
         loginVo.setToken(token);
         loginVo.setRefresh_token("");
 
         // 返回
         return loginVo;
+    }
+
+    @Override
+    public SysUser getUserInfo(String token) {
+
+        String userJson = redisTemplate.opsForValue().get("user:login:" + token);
+        return JSON.parseObject(userJson , SysUser.class) ;
+
+    }
+
+    @Override
+    public void logOut(String token) {
+
+//     后端根据token从Redis中删除用户数据
+
+        if (token != null){
+
+            redisTemplate.delete("user:login:" + token );
+
+        }
+
+
+
     }
 }
