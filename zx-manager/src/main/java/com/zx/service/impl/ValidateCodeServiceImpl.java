@@ -28,7 +28,6 @@ public class ValidateCodeServiceImpl implements ValidateCodeService {
         //参数：宽  高  验证码位数 干扰线数量
         CircleCaptcha circleCaptcha = CaptchaUtil.createCircleCaptcha(150, 48, 4, 20);
         String codeValue = circleCaptcha.getCode();
-        System.out.println(codeValue);
         String imageBase64 = circleCaptcha.getImageBase64();
 
         // 生成uuid作为图片验证码的key

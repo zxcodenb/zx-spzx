@@ -1,7 +1,7 @@
 package com.zx.controller;
 
 
-
+import com.zx.AuthContextUtil;
 import com.zx.service.SysUserService;
 import com.zx.service.ValidateCodeService;
 import com.zx.spzx.model.dto.system.LoginDto;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Tag(name = "用户接口")
 @RequestMapping("/admin/system/index")
-@Log4j2
 public class IndexController {
 
 
@@ -32,7 +31,6 @@ public class IndexController {
     @PostMapping("/login")
     public Result<LoginVo> login(@RequestBody LoginDto loginDto) {
 
-        log.info("登录接口:{ }" + loginDto);
 
         LoginVo loginVo = sysUserService.login(loginDto);
         return Result.build(loginVo, ResultCodeEnum.SUCCESS);
@@ -43,8 +41,6 @@ public class IndexController {
     @GetMapping("/generateValidateCode")
     public Result<ValidateCodeVo> generateValidateCode() {
 
-        log.info("调用验证码接口");
-
 
         ValidateCodeVo validateCodeVo = validateCodeService.generateValidateCode();
 
@@ -54,12 +50,10 @@ public class IndexController {
 
     @Operation(summary = "用户信息接口")
     @GetMapping(value = "/getUserInfo")
-    public Result<SysUser> getUserInfo(@RequestHeader(name = "token") String token) {
+    public Result<SysUser> getUserInfo() {
 
-        log.info("用户信息接口:{}" + token);
 
-        SysUser sysUser = sysUserService.getUserInfo(token);
-        return Result.build(sysUser, ResultCodeEnum.SUCCESS);
+        return Result.build(AuthContextUtil.get(), ResultCodeEnum.SUCCESS);
     }
 
 
